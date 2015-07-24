@@ -1,16 +1,3 @@
-/* TODO */
-
-/* pseudo-code:
- * ------------
- * 1.  check to see if the file is JSON (attempt to parse it)
- * 1a. if not, move on to the next file / quit
- * 2.  parse the data to a JS data object
- * 3.  run the JsonRefs.resolveRefs on the JS data object
- * 4.  pass the results.resolved along
- * 4a. if an option setting is set, console.log the results.metadata
- * 4b. error handling, as necessary, returning gulp.noop()
- */
-
 'use strict';
 var through = require('through2');
 var gutil = require('gulp-util');

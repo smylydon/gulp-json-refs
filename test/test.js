@@ -31,3 +31,9 @@ describe('gulp-json-refs', function() {
     });
   });
 });
+
+// Use cases
+// same file with path  "$ref": "#/definitions/address"
+// other file           "$ref": "/example.json"
+// other with path      "$ref": "/example.json#/foo/inner%20object/baz"
+// other with path      "$ref": "/example.json#/foo/bar/0"
