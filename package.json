@@ -1,6 +1,7 @@
 {
   "name": "gulp-json-refs",
   "version": "1.0.0",
+  "gulpplugin": "gulp-json-refs",
   "description": "Gulp package for json-refs",
   "main": "index.js",
   "scripts": {
@@ -21,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/scott-morris/gulp-json-refs/issues"
   },
-  "homepage": "https://github.com/scott-morris/gulp-json-refs"
+  "homepage": "https://github.com/scott-morris/gulp-json-refs",
+  "dependencies": {
+    "gulp-util": "^3.0.6",
+    "json-refs": "^1.0.2",
+    "through2": "^2.0.0"
+  }
 }
