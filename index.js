@@ -17,7 +17,7 @@ var gutil = require('gulp-util');
 var PluginError = gutil.PluginError;
 var JsonRefs = require('json-refs');
 
-const PLUGIN_NAME = 'gulp-json-refs';
+var PLUGIN_NAME = 'gulp-json-refs';
 
 function trycatch(fn, handle) {
   try {
