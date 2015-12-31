@@ -1,83 +1,36 @@
-'use strict';
-var through = require('through2');
-var gutil = require('gulp-util');
-var PluginError = gutil.PluginError;
-var JsonRefs = require('json-refs');
+var es = require("event-stream");
+var clone = require("clone");
+var JsonRefs = require("json-refs");
 
-var PLUGIN_NAME = 'gulp-json-refs';
-
-function trycatch(fn, handle) {
-  try {
-    return fn();
-  } catch (e) {
-    return handle(e);
+function getJsonMatch (filePath) {
+  if (typeof filePath === "string") {
+    return filePath.match(/.json$/);
   }
-}
-
-function setup(opts) {
-  var options = deap({}, opts);
-
-
-  return options;
-}
-
-function createError(file, err) {
-  if (typeof err === 'string') {
-    return new PluginError(pluginName, file.path + ': ' + err, {
-      fileName: file.path,
-      showStack: false
-    });
-  }
-
-  var msg = err.message || err.msg || /* istanbul ignore next */ 'unspecified error';
-
-  return new PluginError(pluginName, file.path + ': ' + msg, {
-    fileName: file.path,
-    lineNumber: err.line,
-    stack: err.stack,
-    showStack: false
-  });
 }
 
 module.exports = function(opts) {
-  function json_res(file, encoding, callback) {
-    var options = opts || {};
+  "use strict";
+  opts = opts || {};
 
-    if (file.isNull()) {
+  function resolveRefs(file, callback) {
+    var options = clone(opts);
+
+    if (file.isNull() || !getJsonMatch(file.path)) {
       return callback(null, file);
     }
 
-    if (file.isStream()) {
-      return callback(createError(file, 'Streaming not supported'));
+    // If location not specified, set it to the file's folder for relative references to work
+    if (!options.location) {
+      options.location = file.path.split("/").slice(0,-1).join("/");
     }
 
-    // Check to see if file is valid JSON
-    var jsonData = trycatch(function() {
-      return JSON.parse(file.contents);
-    }, createError.bind(file, 'File not valid JSON'));
-
-    if (jsonData instanceof PluginError) {
-      return callback(jsonData);
-    }
-
-    // Attempt to run Json_Ref on the file data
-    var res = trycatch(function() {
-      return JsonRefs.resolveRefs(jsonData);
-    }, createError.bind(null, file));
-
-    if (res instanceof PluginError) {
-      return callback(res);
-    }
-
-    // res is a promise
-    res.then(function (results) {
-      file.contents = results.resolved;
-      if (options.showMetaData) {
-        console.log(results.metadata);
-      }
+    JsonRefs.resolveRefs(JSON.parse(file.contents), options).then(function (results) {
+      file.contents = new Buffer(JSON.stringify(results.resolved));
       callback(null, file);
+    }, function (error) {
+      callback();
     });
   }
 
-  return through.obj(json_res);
+  return es.map(resolveRefs);
 };

@@ -1,0 +1,6 @@
+{
+    "name": "json-refs",
+    "owner": {
+        "$ref": "https://api.github.com/repos/whitlockjc/json-refs#/owner/login"
+    }
+}

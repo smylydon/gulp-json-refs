@@ -1,34 +1,86 @@
-var assert = require('assert');
-var es = require('event-stream');
-var File = require('vinyl');
-var JsonRefs = require('../');
+var gulp = require("gulp");
+var gulpJsonRefs = require("../index.js");
+var es = require("event-stream");
+var path = require("path");
+var assert = require("assert");
 
-describe('gulp-json-refs', function() {
-  describe('in buffer mode', function() {
+require("mocha");
 
-    it('should resolve references', function(done) {
+describe("gulp-json-refs", function() {
+  "use strict";
 
-      // create the fake file
-      var fakeFile = new File({
-        contents: new Buffer('{ "desc": "abufferwiththiscontent" }')
-      });
+  function compareResults (done, options) {
+    options = options || {};
 
-      // Create a JsonRefs plugin stream
-      var myJsonRefs = JsonRefs();
-
-      // write the fake file to it
-      myJsonRefs.write(fakeFile);
-
-      // wait for the file to come back out
-      myJsonRefs.once('data', function(file) {
-        // make sure it came out the same way it went in
-        assert(file.isBuffer());
-
-        // check the contents
-        assert.equal(file.contents.toString('utf8'), '{ "desc": "aabufferwiththiscontent" }');
-        done();
-      });
+    return es.map(function (file) {
+      var result = String(file.contents);
+      var expected = options.expected;
+      assert.equal(result, expected);
+      done();
     });
+  }
+
+  it ("should resolve same file refs", function (done) {
+    gulp.src(path.join(__dirname, "./fixtures/same-file-reference.json"))
+      .pipe(gulpJsonRefs())
+      .pipe(compareResults(done, {
+        expected: JSON.stringify({
+          "name": {
+            "first": "Bob",
+            "last": "Loblaw"
+          },
+          "owner": {
+            "first": "Bob",
+            "last": "Loblaw"
+          }
+        })
+      }));
+  });
+
+  it ("should resolve local file refs", function (done) {
+    gulp.src(path.join(__dirname, "./fixtures/local-file-reference.json"))
+      .pipe(gulpJsonRefs())
+      .pipe(compareResults(done, {
+        expected: JSON.stringify({
+          "author": {
+            "first": "Bob",
+            "last": "Loblaw"
+          }
+        })
+      }));
+  });
+
+  it ("should resolve references in a referenced file", function (done) {
+    gulp.src(path.join(__dirname, "./fixtures/refer-to-reference.json"))
+      .pipe(gulpJsonRefs())
+      .pipe(compareResults(done, {
+        expected: JSON.stringify({
+          "title": "json",
+          "author": {
+            "first": "Bob",
+            "last": "Loblaw"
+          }
+        })
+      }));
+  });
+
+  it ("should resolve remote refs", function (done) {
+    gulp.src(path.join(__dirname, "./fixtures/remote-reference.json"))
+      .pipe(gulpJsonRefs())
+      .pipe(compareResults(done, {
+        expected: JSON.stringify({
+          "name": "json-refs",
+          "owner": "whitlockjc"
+        })
+      }));
+  });
+
+  it ("should accept a non-JSON file but do nothing to it", function (done) {
+    gulp.src(path.join(__dirname, "./fixtures/invalid-json.html"))
+      .pipe(gulpJsonRefs())
+      .pipe(compareResults(done, {
+        expected: "<p>This is not JSON</p>"
+      }));
   });
 });
 

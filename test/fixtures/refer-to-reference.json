@@ -1,0 +1,6 @@
+{
+    "title": "json",
+    "author": {
+        "$ref": "local-file-reference.json#/author"
+    }
+}

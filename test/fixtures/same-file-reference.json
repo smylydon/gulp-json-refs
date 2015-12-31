@@ -1,0 +1,9 @@
+{
+    "name": {
+        "first": "Bob",
+        "last": "Loblaw"
+    },
+    "owner": {
+        "$ref": "#/name"
+    }
+}
