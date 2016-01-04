@@ -1,10 +1,17 @@
 var es = require("event-stream");
 var clone = require("clone");
 var JsonRefs = require("json-refs");
+var YAML = require("yaml-js");
 
 function getJsonMatch (filePath) {
   if (typeof filePath === "string") {
-    return filePath.match(/.json$/);
+    return filePath.match(/\.json$/);
+  }
+}
+
+function getYamlMatch (filePath) {
+  if (typeof filePath === "string") {
+    return filePath.match(/\.yaml$/);
   }
 }
 
@@ -13,9 +20,19 @@ module.exports = function(opts) {
   opts = opts || {};
 
   function resolveRefs(file, callback) {
-    var options = clone(opts);
+    var options = clone(opts),
+        fileContents;
 
-    if (file.isNull() || !getJsonMatch(file.path)) {
+    if (file.isNull()) {
+      return callback(null, file);
+    }
+
+    // Parse YAML or JSON, depending on settings
+    if (options.yaml && getYamlMatch(file.path)) {
+      fileContents = YAML.load(file.contents);
+    } else if (getJsonMatch(file.path)) {
+      fileContents = JSON.parse(file.contents);
+    } else {
       return callback(null, file);
     }
 
@@ -24,8 +41,9 @@ module.exports = function(opts) {
       options.location = file.path.split("/").slice(0,-1).join("/");
     }
 
-    JsonRefs.resolveRefs(JSON.parse(file.contents), options).then(function (results) {
-      file.contents = new Buffer(JSON.stringify(results.resolved));
+    JsonRefs.resolveRefs(fileContents, options).then(function (results) {
+      var output = (options.yaml) ? YAML.dump(results.resolved) : JSON.stringify(results.resolved);
+      file.contents = new Buffer(output);
       callback(null, file);
     }, function (error) {
       callback();
