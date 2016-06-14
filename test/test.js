@@ -3,7 +3,7 @@ var gulpJsonRefs = require("../index.js");
 var es = require("event-stream");
 var path = require("path");
 var assert = require("assert");
-var YAML = require("yaml-js");
+var YAML = require("js-yaml");
 
 require("mocha");
 
@@ -83,7 +83,7 @@ describe("gulp-json-refs", function() {
       gulp.src(path.join(__dirname, "./fixtures/same-file-reference.yaml"))
         .pipe(gulpJsonRefs({ "yaml": true }))
         .pipe(compareResults(done, {
-          expected: YAML.dump({
+          expected: YAML.safeDump({
             "name": {
               "first": "Bob",
               "last": "Loblaw"
@@ -100,7 +100,7 @@ describe("gulp-json-refs", function() {
       gulp.src(path.join(__dirname, "./fixtures/local-file-reference.yaml"))
         .pipe(gulpJsonRefs({ "yaml": true }))
         .pipe(compareResults(done, {
-          expected: YAML.dump({
+          expected: YAML.safeDump({
             "author": {
               "first": "Bob",
               "last": "Loblaw"
@@ -113,7 +113,7 @@ describe("gulp-json-refs", function() {
       gulp.src(path.join(__dirname, "./fixtures/refer-to-reference.yaml"))
         .pipe(gulpJsonRefs({ "yaml": true }))
         .pipe(compareResults(done, {
-          expected: YAML.dump({
+          expected: YAML.safeDump({
             "title": "json",
             "author": {
               "first": "Bob",
@@ -127,20 +127,12 @@ describe("gulp-json-refs", function() {
       gulp.src(path.join(__dirname, "./fixtures/remote-reference.yaml"))
         .pipe(gulpJsonRefs({ "yaml": true }))
         .pipe(compareResults(done, {
-          expected: YAML.dump({
+          expected: YAML.safeDump({
             "name": "json-refs",
             "owner": "whitlockjc"
           })
         }));
     });  });
-
-  it ("should accept a non-JSON / non-YAML file but do nothing to it", function (done) {
-    gulp.src(path.join(__dirname, "./fixtures/invalid-json.html"))
-      .pipe(gulpJsonRefs())
-      .pipe(compareResults(done, {
-        expected: "<p>This is not JSON</p>"
-      }));
-  });
 });
 
 // Use cases
