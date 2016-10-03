@@ -1,7 +1,7 @@
 {
   "name": "gulp-json-refs",
   "version": "0.1.1",
-  "gulpplugin": "gulp-json-refs",
+  "gulpplugin": "gulp-json-refs-signnow",
   "description": "Gulp package for json-refs",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/scott-morris/gulp-json-refs.git"
+    "url": "https://github.com/smylydon/gulp-json-refs.git"
   },
   "keywords": [
     "json-refs",
@@ -20,9 +20,9 @@
   "author": "Scott Morris",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/scott-morris/gulp-json-refs/issues"
+    "url": "https://github.com/smylydon/gulp-json-refs/issues"
   },
-  "homepage": "https://github.com/scott-morris/gulp-json-refs",
+  "homepage": "https://github.com/smylydon/gulp-json-refs",
   "dependencies": {
     "clone": "^1.0.2",
     "event-stream": "^3.3.1",
