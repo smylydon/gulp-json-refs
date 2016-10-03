@@ -3,7 +3,7 @@ var clone = require("clone");
 var JsonRefs = require("json-refs");
 var YAML = require("js-yaml");
 
-module.exports.resolveRefsAt = {
+module.exports = {
         resolveRefsAt: function (opts) {
             "use strict";
             opts = opts || {};
